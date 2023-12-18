@@ -1,5 +1,5 @@
 const findLargestElement = require('../easy/findLargestElement');
-
+console.log("**********Inside*******");
 describe('findLargestElement', () => {
     test('returns the largest element in the array', () => {
         expect(findLargestElement([3, 7, 2, 9, 1])).toBe(9);
