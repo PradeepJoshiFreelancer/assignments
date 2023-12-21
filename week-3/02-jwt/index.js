@@ -17,7 +17,7 @@ const zod = require("zod")
 
 const schema = zod.object({
     username: zod.string().email(),
-    password: zod.string().min(8)
+    password: zod.string().min(6)
 });
 
 function signJwt(username, password) {
@@ -63,17 +63,14 @@ function decodeJwt(token) {
     // Your code here
     try {
         const decode = jwt.decode(token)
-        return decode
+        console.log(decode);
+        if(decode) return true
+        else return false
     } catch {
         return false
     }
 }
-
-const token = signJwt("pradeep@abc.com", "123456789")
-console.log(verifyJwt(token))
-console.log(decodeJwt(token))
-
-
+decodeJwt("token")
 module.exports = {
     signJwt,
     verifyJwt,

@@ -25,10 +25,8 @@ const incrementatlCounter = (req, res, next) => {
   if (numberOfRequestsForUser[user]) {
     numberOfRequestsForUser[user]++
   } else {
-    console.log(`Before = ${JSON.stringify(numberOfRequestsForUser)}`);
     numberOfRequestsForUser[user] = 1
   }
-  console.log(`After = ${JSON.stringify(numberOfRequestsForUser)}`);
   if (numberOfRequestsForUser[user] && numberOfRequestsForUser[user] > 5) {
     res.status(404).json({ error: "Cannot hit more than 5 request in 1 second." })
     return
