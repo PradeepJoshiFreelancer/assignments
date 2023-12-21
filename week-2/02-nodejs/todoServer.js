@@ -39,11 +39,99 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+const express = require('express');
+const fs = require("fs")
+const bodyParser = require('body-parser');
+const { log } = require('console');
+
+const app = express();
+
+app.use(bodyParser.json());
+
+app.get("/todos", (req, res) => {
+  fs.readFile("todos.json", (err, data) => {
+    if (err) {
+      throw err
+    }
+    res.json(JSON.parse(data))
+  })
+})
+
+app.get("/todos/:id", (req, res) => {
+  const id = parseInt(req.params.id)
+  fs.readFile("todos.json", "utf8", (err, data) => {
+    if (err) {
+      throw err
+    }
+    const todos = JSON.parse(data)
+    const todo = todos.find(todo => todo.id == id)
+    res.json(todo)
+  })
+})
+
+app.post("/todos", (req, res) => {
+  let todo = req.body
+  todo = { ...todo, id: Math.floor(Math.random() * 1000000) }
+  fs.readFile("todos.json", "utf8", (err, data) => {
+    if (err) {
+      throw err
+    }
+    const todos = JSON.parse(data)
+    todos.push(todo)
+    fs.writeFile("todos.json", JSON.stringify(todos), (err) => {
+      if (err) throw err
+      res.status(201).json(todos)
+    })
+  })
+})
+
+app.put("/todos/:id", (req, res) => {
+  const id = parseInt(req.params.id)
+  fs.readFile("todos.json", "utf8", (err, data) => {
+    if (err) {
+      throw err
+    }
+
+    const todos = JSON.parse(data)
+
+    let todoIndex = todos.findIndex(todo => todo.id == id)
+    let newTodo = req.body
+    if (todoIndex == -1) {
+      newTodo = { ...newTodo, id: Math.floor(Math.random() * 1000000) }
+      todos.push(todos)
+    } else {
+      newTodo = { ...newTodo, id: todos[todoIndex].id }
+      todos[todoIndex] = newTodo
+    }
+    fs.writeFile("todos.json", JSON.stringify(todos), (err) => {
+      if (err) throw err
+      res.status(201).json(todos)
+    })
+  })
+})
+
+app.delete("/todos/:id", (req, res) =>{
+  const id = parseInt(req.params.id)
+  fs.readFile("todos.json", "utf8", (err, data) => {
+    if (err) {
+      throw err
+    }
+
+    const todos = JSON.parse(data)
+
+    let newTodos = todos.filter(todo => todo.id != id)
+
+    fs.writeFile("todos.json", JSON.stringify(newTodos), (err) => {
+      if (err) throw err
+      res.status(201).json(newTodos)
+    })
+  })
+})
+
+
+app.all('*', (req, res) => {
+  res.status(404).send('Route not found');
+});
+
+module.exports = app;
+app.listen(3000)

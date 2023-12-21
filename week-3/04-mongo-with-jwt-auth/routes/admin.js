@@ -1,22 +1,74 @@
 const { Router } = require("express");
 const adminMiddleware = require("../middleware/admin");
 const router = Router();
+const jwt = require('jsonwebtoken');
+let adminServerCount = 0
+const jwtPassword = "password"
+
+const zod = require("zod");
+const { Admin, Course } = require("../db");
+
+const schema = zod.object({
+    username: zod.string().email(),
+    password: zod.string().min(6)
+});
 
 // Admin Routes
-app.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     // Implement admin signup logic
+    let username = req.body.username
+    let password = req.body.password
+
+    const response = schema.safeParse({ username, password })
+    if (!response.success) {
+        res.status(404).json({ message: "username/password invalid" })
+    }
+    await Admin.create({
+        username: req.body.username,
+        password: req.body.password
+    })
+    res.json({ message: "Admin created successfully!" })
 });
 
-app.post('/signin', (req, res) => {
+router.get('/signin', async (req, res) => {
     // Implement admin signup logic
+    let username = req.headers.username
+    let password = req.headers.password
+    const response = schema.safeParse({ username, password })
+
+    if (!response.success) {
+        res.status(404).json({ message: "username/password invalid" })
+    }
+    const persons = await Admin.find({ username: username, password: password });
+    if (persons.length !== 1) {
+        res.status(404).json({ message: "Invalid admin user or password" });
+        return
+    }
+    const token = jwt.sign({ username: username }, jwtPassword)
+    res.json({ token: token })
 });
 
-app.post('/courses', adminMiddleware, (req, res) => {
+// router.post('/signin', (req, res) => {
+//     // Implement admin signup logic
+// });
+
+router.post('/courses', adminMiddleware, async (req, res) => {
     // Implement course creation logic
+    await Course.create({
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        imageLink: req.body.imageLink,
+        published: true
+    })
+    res.json({ message: "New Cource Created!" })
 });
 
-app.get('/courses', adminMiddleware, (req, res) => {
+router.get('/courses', adminMiddleware, (req, res) => {
     // Implement fetching all courses logic
+    Course.find().then((cources) => {
+        res.json(cources)
+    })
 });
 
-module.exports = router;
+module.exports = router
