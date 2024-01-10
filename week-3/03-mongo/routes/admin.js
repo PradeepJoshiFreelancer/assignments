@@ -5,7 +5,7 @@ const router = Router();
 
 
 // Admin Routes
-router.post('/signup', async (req, res) => {
+app.post('/signup', async (req, res) => {
     // Implement admin signup logic
     await Admin.create({
         username: req.body.username,
@@ -14,7 +14,7 @@ router.post('/signup', async (req, res) => {
     res.json({ message: "Admin created successfully!" })
 });
 
-router.post('/courses', adminMiddleware, async (req, res) => {
+app.post('/courses', adminMiddleware, async (req, res) => {
     // Implement course creation logic
     await Course.create({
         title: req.body.title,

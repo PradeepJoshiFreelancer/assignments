@@ -21,7 +21,11 @@ router.get('/courses', (req, res) => {
     })
 });
 
-router.post('/courses/:courseId', userMiddleware, async (req, res) => {
+router.post('/courses/:courseId', userMiddleware, (req, res) => {
+    // Implement course purchase logic
+});
+
+router.get('/purchasedCourses', userMiddleware, async (req, res) => {
     // Implement course purchase logic
     let courseId = req.params.courseId
     let username = req.headers.username
@@ -38,18 +42,3 @@ router.post('/courses/:courseId', userMiddleware, async (req, res) => {
     }
 
 });
-
-router.get('/purchasedCourses', userMiddleware, async (req, res) => {
-    // Implement fetching purchased courses logic
-    let username = req.headers.username
-    const user = await User.find({ username: username });
-    if (user.length == 1) {
-        let cources = await Course.find({ _id: { $in: user[0].coursesPurchased } })
-        res.json(cources)
-        return
-    }
-    res.json({ message: "Unable to resolve to a single person" })
-});
-
-
-module.exports = router;

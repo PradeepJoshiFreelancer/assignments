@@ -14,7 +14,7 @@ const schema = zod.object({
 });
 
 // Admin Routes
-router.post('/signup', async (req, res) => {
+app.post('/signup', async(req, res) => {
     // Implement admin signup logic
     let username = req.body.username
     let password = req.body.password
@@ -30,29 +30,11 @@ router.post('/signup', async (req, res) => {
     res.json({ message: "Admin created successfully!" })
 });
 
-router.get('/signin', async (req, res) => {
+app.post('/signin', async(req, res) => {
     // Implement admin signup logic
-    let username = req.headers.username
-    let password = req.headers.password
-    const response = schema.safeParse({ username, password })
-
-    if (!response.success) {
-        res.status(404).json({ message: "username/password invalid" })
-    }
-    const persons = await Admin.find({ username: username, password: password });
-    if (persons.length !== 1) {
-        res.status(404).json({ message: "Invalid admin user or password" });
-        return
-    }
-    const token = jwt.sign({ username: username }, jwtPassword)
-    res.json({ token: token })
 });
 
-// router.post('/signin', (req, res) => {
-//     // Implement admin signup logic
-// });
-
-router.post('/courses', adminMiddleware, async (req, res) => {
+app.post('/courses', adminMiddleware, async(req, res) => {
     // Implement course creation logic
     await Course.create({
         title: req.body.title,
