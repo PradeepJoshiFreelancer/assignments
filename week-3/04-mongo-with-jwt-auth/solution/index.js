@@ -84,8 +84,7 @@ app.post('/users/courses/:courseId', (req, res) => {
 
 });
 
-app.get('/users/purchasedCourses', (req, res) => {
-    // Implement fetching purchased courses logic
+app.get('/users/purchasedCourses', (req, res) => {    // Implement fetching purchased courses logic
 });
 
 // Start the server
